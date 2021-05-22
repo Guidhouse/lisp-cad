@@ -1,0 +1,47 @@
+(ns openscad-tryout.core
+  (:use [scad-clj.scad])
+  (:use [ scad-clj.model]))
+
+
+(def base
+  (intersection (square 25 20)
+               (->> (circle 20)
+                (translate [20 0 0]))
+               )
+  )
+
+
+
+
+(def primitives
+  (union
+   (difference
+    (union
+     (->> (cube 10 10 10 )
+          (rotate [0 0 0])
+          (translate [150 0 0]))
+     (->> (sphere 1)
+          (scale [1/2 1/2 1])
+          (translate [-100 0 0]))
+     (cylinder 5 16)
+     
+     )
+    (->> (cube 200 200 200)
+         (translate [30 0 70])
+         )
+    )
+   (->> (cube 19 20 20)
+        (translate [30 0 70])
+        (->> (cube 19 20 20)
+             (translate [30 0 70])
+             )
+        )
+   
+   (->> base
+        (extrude-linear {:height 10})
+        )
+
+   )
+)
+(spit "../../post-demo.scad"
+      (write-scad primitives))
