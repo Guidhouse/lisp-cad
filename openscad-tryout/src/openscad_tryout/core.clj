@@ -1,5 +1,6 @@
 (ns openscad-tryout.core
   (:use [scad-clj.scad])
+  (:use [scad-clj.model])
   )
 
 (def space 14.07)
