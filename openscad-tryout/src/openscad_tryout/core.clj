@@ -6,11 +6,10 @@
 
 (def space 14.07)
 (def c-dist 19.05)
-(def kb-vec [["","", ""],["",""],["","",""]])
+(def kb-vec (json/read-json (slurp "input.json")))
 
 (def height (* c-dist (count kb-vec)))
 (def width (* c-dist (apply max (map #(count %) kb-vec))))
-
 
 (defn mount-holes [t]
   (with-local-vars [main-hole-d (/ 4.2 2), connector-hole-d (/ 3.2 2), side-hole-d (/ 1.9 2)]    
@@ -24,7 +23,6 @@
 (defn mount-rows [i row cut]
   (model/translate [0 (* (* c-dist i) -1)]
              (map-indexed #(model/translate [(* c-dist %1 ) 0] (cut %2)) row)))
-
 
 
 (def mount-plate
