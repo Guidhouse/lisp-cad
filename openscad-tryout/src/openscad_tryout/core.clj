@@ -8,7 +8,12 @@
 (def kb-vec (json/read-json (slurp "input.json")))
 
 (def height (* c-dist (count kb-vec)))
-(def width (* c-dist (apply max (map #(count %) kb-vec))))
+
+(defn row_width [v]
+  (+ (apply + (map  #(get % :x 0) v))
+     (count (filter #(= (type %) java.lang.String ) v))))
+
+(def width (* c-dist (apply max (map #(row_width %) kb-vec))))
 
 (def mount-holes
   (with-local-vars [main-hole-d (/ 4.2 2), connector-hole-d (/ 3.2 2), side-hole-d (/ 1.9 2)]    
@@ -19,10 +24,16 @@
       (model/translate [-5 0] (model/circle @side-hole-d))
       (model/translate [5 0] (model/circle @side-hole-d)))))
 
+
 (defn s-row [x row cut holes]
+  (def is_hole (= (type (first row)) java.lang.String))
+  (def x_mod (if is_hole (+ x c-dist) (get-x-mods (first row))))
   (if (empty? row)
     holes
-    (recur (+ x 1) (rest row) cut (conj holes (model/translate [(* c-dist x) 0] cut)))))
+    (if is_hole
+      (recur x_mod (rest row) cut (conj holes (model/translate [x_mod  0] cut)))      
+      (recur  (+ x  (*(get (first row) :x) c-dist)) (rest row) cut holes)
+      )))
 
 (defn rows [y row cut]
   (model/translate [0 (* (* c-dist y) -1)]
@@ -32,8 +43,8 @@
   (model/extrude-linear {:height t :center false}  
                         (model/difference
                          (model/square (+ w f) (+ h f) :center true )
-                         (model/translate  [(+ (/ w -2) (/ c-dist 2)) (- (/ h 2) (/ c-dist 2))]
-                                           (map-indexed #(rows %1 %2 (hole s)) kb-vec)))))
+                         (model/translate  [(- (/ w -2) (/ c-dist 2)) (- (/ h 2) (/ c-dist 2))]
+                                           (map-indexed #(rows %1 %2 (top-hole s)) kb-vec)))))
 
 (def mount-plate
   (model/extrude-linear {:height 1.5}  
@@ -42,7 +53,7 @@
                          (model/translate  [(+ (/ width -2) (/ c-dist 2)) (- (/ height 2) (/ c-dist 2))]
                                            (map-indexed #(rows %1 %2 mount-holes) kb-vec)))))
 
-(defn hole [s]
+(defn top-hole [s]
   (model/square s s))
 
 (def top-plate
@@ -53,7 +64,6 @@
                          (model/difference 
                           (model/square (+ width 2) (+ height 2))
                           (model/square width height)))))
-
 
 (spit "../scads/top-plate.scad"
       (scad/write-scad top-plate))
