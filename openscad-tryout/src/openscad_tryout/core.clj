@@ -24,13 +24,15 @@
       (model/translate [-5 0] (model/circle @side-hole-d))
       (model/translate [5 0] (model/circle @side-hole-d)))))
 
+(defn top-hole [x y]
+  (model/square x y))
+
 (defn modified_hole [x y r cut]
   (model/translate [x y] 
                    (model/rotate [0 0 (/ model/pi r)] cut))) 
 
 
 (defn s-row [x row cut holes]
-
   (def x_mod  (+ x c-dist))
   (def y_mod  (* (/ (get (first row) :h 0) -4) c-dist))
   (if (empty? row)
@@ -51,7 +53,7 @@
                         (model/difference
                          (model/square (+ w f) (+ h f) :center true )
                          (model/translate  [(- (/ w -2) (/ c-dist 2)) (- (/ h 2) (/ c-dist 2))]
-                                           (map-indexed #(rows %1 %2 (top-hole s)) kb-vec)))))
+                                           (map-indexed #(rows %1 %2 (top-hole s s)) kb-vec)))))
 
 (def mount-plate
   (model/extrude-linear {:height 1.5}  
@@ -60,8 +62,6 @@
                          (model/translate  [(- (/ width -2) (/ c-dist 2)) (- (/ height 2) (/ c-dist 2))]
                                            (map-indexed #(rows %1 %2 mount-holes) kb-vec)))))
 
-(defn top-hole [s]
-  (model/square s s))
 
 (def top-plate
   (model/union 
