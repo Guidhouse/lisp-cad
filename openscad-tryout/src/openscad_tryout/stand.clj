@@ -9,6 +9,7 @@
 (def front-support-length 20)
 (def base-thickness 8)
 (def support-thickness 4)
+(def arc-radius (* support-length 0.8))
 
 (def support-distance 
   "Distance of support rods calculated from thickness of laptop"
@@ -58,11 +59,11 @@
     (base-rod (- (* support-length 0.8) (/ base-thickness 0.75)) 
               (/ base-thickness 2.5)))
    (model/translate 
-    [(+ support-distance (* support-length 0.8) (first support-offset)) (rest support-offset) 0] 
+    [(+ support-distance arc-radius (first support-offset)) (rest support-offset) 0] 
     (model/circle (/ base-thickness 5)))
    (model/translate 
-    [(+ support-distance (* support-length 0.8) (/ base-thickness 1.5) (first support-offset) ) 0 0] 
-    (base-rod (- (- base-length base-thickness  (first support-offset)) support-distance (* support-length 0.8) (/ base-thickness 1.5))
+    [(+ support-distance arc-radius (/ base-thickness 1.5) (first support-offset) ) 0 0] 
+    (base-rod (- (- base-length base-thickness  (first support-offset)) support-distance arc-radius (/ base-thickness 1.5))
               (/ base-thickness 2.5)))))
 
 (def stand
@@ -79,9 +80,9 @@
                                 (model/translate [support-distance 0 0] 
                                                  (model/rotate [0 0 support-angle] 
                                                                (base-rod support-length support-thickness))))
-               (model/translate [support-distance (/ base-thickness 2) 0]
+               (model/translate [support-distance 0 0]
                                 (model/translate support-offset
-                                                 (arc (* support-length 0.8) (* support-thickness 0.8) support-angle)))))
+                                                 (arc arc-radius (* support-thickness 0.8) support-angle)))))
     cutouts)))
 
 (spit "../scads/stand.scad"
