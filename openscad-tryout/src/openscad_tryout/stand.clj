@@ -3,12 +3,12 @@
             [scad-clj.scad :as scad]))
 
 (def support-angle (/ model/pi 8/3))
-(def laptop-thickness 20.5)
-(def support-length 80)
+(def laptop-thickness 11)
+(def support-length 90)
 (def front-support-length 20)
 (def base-thickness 10)
 (def support-thickness 4)
-(def arc-radius (* support-length 0.9))
+(def arc-radius (* support-length 0.95))
 (def support-distance 
   "Distance of support rods calculated from thickness of laptop"
   (/ (+ laptop-thickness support-thickness) (Math/sin support-angle)))
@@ -46,8 +46,8 @@
   "Cutouts to give a more airy feel to the stand and save some plastic"
   (model/union
    (model/circle (/ base-thickness 5))
-   (model/translate [(/ base-thickness 3) (- 0 (/ base-thickness 2) -1) 0]
-                    (model/circle 1.75))
+   (model/translate [(/ base-thickness 3) (- 0 (/ base-thickness 2) -0.2) 0]
+                    (model/circle (/ 1.75 2)))
    (let [rod-length (- support-distance (/ base-thickness 0.75) (- 0  (first support-offset)) )]
      (model/translate [(/ base-thickness 1.5) 0 0]
       (base-rod rod-length (/ base-thickness 2.5))))
@@ -61,10 +61,10 @@
    (let [start-x (+ support-distance arc-radius (first support-offset))]
      (model/translate [start-x (nth support-offset 1) 0] 
                       (model/circle (* (/ support-thickness 2) 0.8))
-     (model/translate [0 (- 0 (/ base-thickness 2)  (nth support-offset 1)  -1) 0]
-                   (model/circle 1.75))))
+                      (model/translate [0 (- 0 (/ base-thickness 2) (nth support-offset 1) -0.2) 0]
+                                       (model/circle (/ 1.75 2)))))
    (let [start-x (+ support-distance arc-radius (/ base-thickness 1.5) (first support-offset) )
-         rod-length (- (- base-length base-thickness  (first support-offset)) support-distance arc-radius (/ base-thickness 1))] 
+         rod-length (- (- base-length base-thickness  (first support-offset)) support-distance arc-radius (/ base-thickness 1.5))] 
      (model/translate [start-x 0 0] 
                       (base-rod rod-length (/ base-thickness 2.5))))
 ))
